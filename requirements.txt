@@ -1,0 +1,7 @@
+streamlit
+protobuf
+click
+numpy
+pandas
+scikit-learn
+plotly
