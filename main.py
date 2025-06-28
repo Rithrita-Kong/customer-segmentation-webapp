@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import pickle
-from sklearn.decomposition import PCA
 import plotly.express as px
 import plotly.graph_objects as go
 
@@ -52,7 +51,7 @@ cluster_descriptions = {
 }
 
 # Page setup
-st.set_page_config(page_title="Customer Transactional Behavior Segmentation", page_icon="🔍", layout="centered")
+st.set_page_config(page_title="Customer Transactional Behavior Segmentation", page_icon="💳", layout="centered")
 st.title("Customer Transactional Behavior Segmentation Web App")
 st.markdown("Enter customer transaction behavior details to assign into a segment:")
 
@@ -139,21 +138,26 @@ if submitted:
         col1.metric("Total Amount", f"${total_amount:,.2f}")
         col2.metric("Avg Transaction Amount", f"${avg_txn_amount:,.2f}")
         col3.metric("Unique Merchants", num_unique_merchants)
+    
     with tab2:
-        # Input Data Visualization
-        st.subheader("📈 Input Data Visualization")
-        fig = px.scatter_3d(
-            pca_cluster_df,
-            x='x', y='y', z='z',
-            color='label',
-            title="PCA Cluster Visualization",
-            opacity=0.5,
-            color_discrete_sequence=px.colors.qualitative.Plotly,
-            category_orders={"label": ordered_labels},
-            labels={"label": "Cluster"}
-        )
+        # Cluster Visualization
+        st.subheader("📈 Cluster Visualization")
+        fig = go.Figure()
+        for clust_num, clust_label in cluster_labels.items():
+            cluster_data = pca_cluster_df[pca_cluster_df["cluster"] == clust_num]
+            fig.add_trace(go.Scatter3d(
+                x=cluster_data["x"],
+                y=cluster_data["y"],
+                z=cluster_data["z"],
+                mode='markers',
+                name=clust_label,
+                marker=dict(
+                    color=px.colors.qualitative.Plotly[clust_num % len(px.colors.qualitative.Plotly)],
+                    opacity=0.1 if clust_num != cluster else 0.9
+                ),
+            ))
 
-        # Add the new input as a distinct point (e.g. red star)
+        # Add the new input point
         fig.add_trace(go.Scatter3d(
             x=[pca_input[0]],
             y=[pca_input[1]],
@@ -164,5 +168,25 @@ if submitted:
             text=["New Input"],
             textposition='top center'
         ))
+
+        # Layout
+        fig.update_layout(
+            title="PCA Cluster Visualization",
+            legend_title="Cluster",
+            scene=dict(
+                xaxis_title="PCA 1",
+                yaxis_title="PCA 2",
+                zaxis_title="PCA 3"
+            ),
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=-0.2,
+                xanchor="center",
+                x=0.5,
+                font=dict(size=10)
+            ),
+            margin=dict(t=40, b=40)
+        )
 
         st.plotly_chart(fig, use_container_width=True)
