@@ -113,7 +113,7 @@ if submitted:
 
     # Output
     st.success(f"🧩 Assigned to: **Cluster {cluster} ({label})**")
-    st.subheader("📊 Cluster Description")
+    st.subheader("💬 Cluster Description")
     st.markdown(cluster_descriptions[cluster])
 
 
