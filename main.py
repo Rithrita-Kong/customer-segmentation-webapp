@@ -129,10 +129,10 @@ if submitted:
         st.error("🚨 This input is far from any cluster center. The assignment may be unreliable.")
     
     
-    tab1, tab2, tab3 = st.tabs(["🧾 Input Summary", "📈 Cluster Visualization", "📊 Input Comparison"])
+    tab1, tab2, tab3 = st.tabs(["📋 Input Summary", "📈 Cluster Visualization", "📊 Input Comparison"])
     with tab1:
         # Input Summary
-        st.subheader("🧾 Input Summary")
+        st.subheader("📋 Input Summary")
         col1, col2, col3 = st.columns(3)
         col1.metric("Days Since Last Transaction", days_since_last_txn)
         col2.metric("Active Days", active_days)
