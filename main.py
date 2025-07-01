@@ -141,9 +141,13 @@ if submitted:
         col1.metric("Total Amount", f"${total_amount:,.2f}")
         col2.metric("Avg Transaction Amount", f"${avg_txn_amount:,.2f}")
         col3.metric("Unique Merchants", num_unique_merchants)
+
+        col1.metric("Chip Transactions", num_chip_txn)
+        col2.metric("Online Transactions", num_online_txn)
+        col3.metric("Swipe Transactions", num_swipe_txn)
     
     with tab2:
-        # Cluster Visualization
+
         st.subheader("📈 Cluster Visualization")
         fig = go.Figure()
         for clust_num, clust_label in cluster_labels.items():
@@ -193,6 +197,7 @@ if submitted:
         )
 
         st.plotly_chart(fig, use_container_width=True)
+
     with tab3:
         mean_cluster = mean_df[mean_df["Cluster"] == cluster]
         median_cluster = median_df[median_df["Cluster"] == cluster]
@@ -200,11 +205,10 @@ if submitted:
         mean_value = mean_cluster.drop(columns=["Cluster"]).iloc[0]
         median_value = median_cluster.drop(columns=["Cluster"]).iloc[0]
 
-        # Ensure indexes match (all should be feature names)
         features_list = ["Day Since Last Transaction", "Active Days", "Number of Transactions",
                    "Total Amount", "Number of Unique Merchants", "Number of Chip Transactions",
                    "Number of Online Transactions", "Number of Swipe Transactions", "Average Transaction Amount"]
-        # Build the comparison DataFrame
+
         comparison_df = pd.DataFrame({
             "Feature": features_list,
             "New Input": input_series.values,
@@ -212,10 +216,9 @@ if submitted:
             "Cluster Median": median_value.values
         })
 
-        # Optional formatting (e.g. round floats)
+
         comparison_df = comparison_df.round(2)
 
-        # Display in Streamlit
         st.subheader("📊 Comparison to Cluster Stats")
         st.dataframe(comparison_df, use_container_width=True)
             
