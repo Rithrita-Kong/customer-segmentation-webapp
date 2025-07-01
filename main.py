@@ -7,11 +7,11 @@ import plotly.graph_objects as go
 
 # Load models
 scaler = pickle.load(open("model config/robust_scaler.pkl", "rb"))
-pca_cluster_df = pd.read_csv("model config/pca_cluster_points.csv")
+pca_cluster_df = pd.read_csv("data/pca_cluster_points.csv")
 pca = pickle.load(open("model config/pca_model.pkl", "rb"))
 kmeans = pickle.load(open("model config/kmeans_model.pkl", "rb"))
-mean_df = pd.read_csv("model config/cluster_mean.csv")
-median_df = pd.read_csv("model config/cluster_median.csv")
+mean_df = pd.read_csv("data/cluster_mean.csv")
+median_df = pd.read_csv("data/cluster_median.csv")
 
 # Cluster label dictionary
 cluster_labels = {
