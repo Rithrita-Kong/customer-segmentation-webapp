@@ -1,0 +1,5 @@
+days_since_last_txn,active_days,num_txn,total_amount,num_unique_merchants,num_chip_txn,num_online_txn,num_swipe_txn,avg_txn_amount,Cluster
+0,183,816,40241.92,74,452,214,55,46.17,0
+0,143,303.5,15920.85,59,222,21,28,54.17,1
+0,172,459,23858.46,63.5,0,28.5,402,48.5,2
+0,178,546,27272.76,71,423,28,60,50.98,3

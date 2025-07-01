@@ -10,6 +10,8 @@ scaler = pickle.load(open("model config/robust_scaler.pkl", "rb"))
 pca_cluster_df = pd.read_csv("model config/pca_cluster_points.csv")
 pca = pickle.load(open("model config/pca_model.pkl", "rb"))
 kmeans = pickle.load(open("model config/kmeans_model.pkl", "rb"))
+mean_df = pd.read_csv("model config/cluster_mean.csv")
+median_df = pd.read_csv("model config/cluster_median.csv")
 
 # Cluster label dictionary
 cluster_labels = {
@@ -71,7 +73,7 @@ if submitted:
     num_txn = num_chip_txn + num_online_txn + num_swipe_txn
     avg_txn_amount = total_amount / num_txn if num_txn > 0 else 0.0
     # 1. Create input DataFrame
-    input_data = pd.DataFrame([{
+    input_series = pd.Series({
         "days_since_last_txn": days_since_last_txn,
         "active_days": active_days,
         "num_txn": num_txn,
@@ -81,7 +83,8 @@ if submitted:
         "num_online_txn": num_online_txn,
         "num_swipe_txn": num_swipe_txn,
         "avg_txn_amount": avg_txn_amount
-    }])
+    })
+    input_data = pd.DataFrame([input_series])
 
     # 2. Apply log1p transformation
     log_transformed = np.log1p(input_data)
@@ -126,7 +129,7 @@ if submitted:
         st.error("🚨 This input is far from any cluster center. The assignment may be unreliable.")
     
     
-    tab1, tab2 = st.tabs(["🧾 Input Summary", "📈 Cluster Visualization"])
+    tab1, tab2, tab3 = st.tabs(["🧾 Input Summary", "📈 Cluster Visualization", "📊 Input Comparison"])
     with tab1:
         # Input Summary
         st.subheader("🧾 Input Summary")
@@ -153,7 +156,7 @@ if submitted:
                 name=clust_label,
                 marker=dict(
                     color=px.colors.qualitative.Plotly[clust_num % len(px.colors.qualitative.Plotly)],
-                    opacity=0.1 if clust_num != cluster else 0.9
+                    opacity=0.2 if clust_num != cluster else 0.9
                 ),
             ))
 
@@ -190,3 +193,29 @@ if submitted:
         )
 
         st.plotly_chart(fig, use_container_width=True)
+    with tab3:
+        mean_cluster = mean_df[mean_df["Cluster"] == cluster]
+        median_cluster = median_df[median_df["Cluster"] == cluster]
+
+        mean_value = mean_cluster.drop(columns=["Cluster"]).iloc[0]
+        median_value = median_cluster.drop(columns=["Cluster"]).iloc[0]
+
+        # Ensure indexes match (all should be feature names)
+        features_list = ["Day Since Last Transaction", "Active Days", "Number of Transactions",
+                   "Total Amount", "Number of Unique Merchants", "Number of Chip Transactions",
+                   "Number of Online Transactions", "Number of Swipe Transactions", "Average Transaction Amount"]
+        # Build the comparison DataFrame
+        comparison_df = pd.DataFrame({
+            "Feature": features_list,
+            "New Input": input_series.values,
+            "Cluster Mean": mean_value.values,
+            "Cluster Median": median_value.values
+        })
+
+        # Optional formatting (e.g. round floats)
+        comparison_df = comparison_df.round(2)
+
+        # Display in Streamlit
+        st.subheader("📊 Comparison to Cluster Stats")
+        st.dataframe(comparison_df, use_container_width=True)
+            
